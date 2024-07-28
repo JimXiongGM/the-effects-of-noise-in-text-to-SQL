@@ -2,15 +2,20 @@
 import sqlite3
 import os
 import logging
+import codecs
+import chardet
 
 from src.timer import Timer
 from src.utils import load_json
 from collections import Counter
 
+def detect_encoding(filename):
+    with open(filename, "rb") as f:
+        raw_data = f.read()
+    result = chardet.detect(raw_data)
+    return result["encoding"]
+
 class Dataset:
-   DB_PATH = "./datasets/financial.sqlite"
-   DB_DESCRIPTIONS_PATH = "./datasets/database_description"
-   data_path = None
 
    def __init__(self, data_path='./financial/financial.json'):
       self.conn = None
@@ -23,21 +28,19 @@ class Dataset:
       self.last_gold_execution_time = 0
 
       self.database_schema_str = ""
-
       self.load_data()
-      self.load_db()
 
-   def set_db(self, **kwargs):
-      pass
       
    def load_data(self):      
       if self.data_path is None:
-         raise ValueError("DATA_PATH must be defined")
-      self.data = load_json(self.data_path)
+         raise ValueError("data_path must be defined")
+      self.data = sorted(load_json(self.data_path), key=lambda x: x['db_id'])
 
 
-   def load_db(self):
-      self.conn = sqlite3.connect(self.DB_PATH)
+   def set_db(self, db):
+      p = f"minidev/dev_databases/{db}/{db}.sqlite"
+      self.db_desc_dir = f"minidev/dev_databases/{db}/database_description/"
+      self.conn = sqlite3.connect(p)
       self.cursor = self.conn.cursor()
          
    
@@ -45,7 +48,10 @@ class Dataset:
       return len(self.data)
    
 
-   def get_data_point(self, index):      
+   def get_data_point(self, index):
+      # set db
+      db_id = self.data[index]['db_id']
+      self.set_db(db_id)
       return self.data[index]
 
    
@@ -162,12 +168,13 @@ class Dataset:
       """                  
       table_info = ""
       
-      for filename in os.listdir(self.DB_DESCRIPTIONS_PATH):
+      for filename in os.listdir(self.db_desc_dir):
          if filename.endswith(".csv"):
             table_name = filename.rstrip(".csv")
-            csv_path = os.path.join(self.DB_DESCRIPTIONS_PATH, filename)
+            csv_path = os.path.join(self.db_desc_dir, filename)
             
-            with open(csv_path, mode='r', encoding='utf-8') as file:
+            encoding = detect_encoding(csv_path)
+            with codecs.open(csv_path, mode='r', encoding=encoding, errors="replace") as file:
                file_contents = file.read()                                   
             
             table_info += "Table " + table_name + "\n"
@@ -177,13 +184,13 @@ class Dataset:
 
       return table_info
 
-from src.datasets_minidiv import Dataset as MinidivDataset
+
 DATASET_LOADERS = {
-    'FinancialCorrected-orignal': lambda: Dataset(data_path="datasets/financial.json"),
+    'Financial': lambda: Dataset(),
     'FinancialCorrected': lambda: Dataset(data_path='./datasets/financial_corrected.json'),
     'FinancialCorrectedSQL': lambda: Dataset(data_path='./datasets/financial_corrected_sql.json'),
     # add
-    "minidev": lambda: MinidivDataset(data_path='./minidev/mini_dev_sqlite.json'),
+    "minidev": lambda: Dataset(data_path='./minidev/mini_dev_sqlite.json'),
 }
 
 def get_dataset(dataset_name):

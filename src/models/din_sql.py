@@ -1,9 +1,9 @@
 
 
-from models.zero_shot import ZeroShotModel
+from src.models.zero_shot import ZeroShotModel
 import re
 from typing import List, Tuple
-from utils.timer import Timer
+from src.timer import Timer
 from langchain.callbacks import get_openai_callback
 from langchain.chains import LLMChain
 from langchain.prompts import (
@@ -1162,6 +1162,7 @@ class DinSQLModel(ZeroShotModel):
             
             logging.debug("Classification LLM Output: \n" + classification)
             label, sub_questions = self.extract_label_and_sub_questions(classification)
+            label = label if label else "None"
             logging.debug("Extracted label: \n" + label)
             logging.debug("Extracted subquestions: \n" + " ".join(sub_questions))
 
@@ -1270,11 +1271,14 @@ class DinSQLModel(ZeroShotModel):
         return label, sub_questions
 
     def extract_sql_query(self, input_text):
-        sql_pattern = r'SQL:\s*(.*?)$'
-        match = re.search(sql_pattern, input_text, re.DOTALL)
-        return match.group(1).strip() if match else None
+        r1 = re.findall(r"```sql\n(.*?)\n```", input_text, re.DOTALL | re.IGNORECASE)
+        r2 = re.search(r'SQL:\s*(.*?)$', input_text, re.DOTALL)
+        r = r1[-1] if r1 else r2
+        return r.strip() if r else None
 
     def extract_revised_sql_query(self, input_text):
-        sql_pattern = r'Revised_SQL:\s*(.*?)$'
-        match = re.search(sql_pattern, input_text, re.DOTALL)
-        return match.group(1).strip() if match else None
+        r1 = re.findall(r"```sql\n(.*?)\n```", input_text, re.DOTALL | re.IGNORECASE)
+        r2 = re.search(r'Revised_SQL:\s*(.*?)$', input_text, re.DOTALL)
+        r = r1[-1] if r1 else r2
+        return r.strip() if r else None
+
