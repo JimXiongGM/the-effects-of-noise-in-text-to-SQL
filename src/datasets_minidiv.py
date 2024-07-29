@@ -38,8 +38,15 @@ class Dataset:
 
 
    def set_db(self, db):
-      p = f"minidev/dev_databases/{db}/{db}.sqlite"
-      self.db_desc_dir = f"minidev/dev_databases/{db}/database_description/"
+      if "mini_dev" in self.data_path:
+         p = f"minidev/dev_databases/{db}/{db}.sqlite"
+         self.db_desc_dir = f"minidev/dev_databases/{db}/database_description/"
+      elif "bird" in self.data_path:
+         p = f"bird/dev_databases/{db}/{db}.sqlite"
+         self.db_desc_dir = f"bird/dev_databases/{db}/database_description/"
+      elif "spider" in self.data_path:
+         p = f"spider/database/{db}/{db}.sqlite"
+         self.db_desc_dir = None
       self.conn = sqlite3.connect(p)
       self.cursor = self.conn.cursor()
          
@@ -167,6 +174,8 @@ class Dataset:
       containing the table information
       """                  
       table_info = ""
+      if not self.db_desc_dir:
+         return table_info
       
       for filename in os.listdir(self.db_desc_dir):
          if filename.endswith(".csv"):
@@ -185,15 +194,14 @@ class Dataset:
       return table_info
 
 
-DATASET_LOADERS = {
-    'Financial': lambda: Dataset(),
-    'FinancialCorrected': lambda: Dataset(data_path='./datasets/financial_corrected.json'),
-    'FinancialCorrectedSQL': lambda: Dataset(data_path='./datasets/financial_corrected_sql.json'),
-    # add
-    "minidev": lambda: Dataset(data_path='./minidev/mini_dev_sqlite.json'),
-}
+# DATASET_LOADERS = {
+#     'Financial': lambda: Dataset(),
+#     'FinancialCorrected': lambda: Dataset(data_path='./datasets/financial_corrected.json'),
+#     'FinancialCorrectedSQL': lambda: Dataset(data_path='./datasets/financial_corrected_sql.json'),
 
-def get_dataset(dataset_name):
-    if dataset_name not in DATASET_LOADERS:
-        raise ValueError(f"Dataset named '{dataset_name}' not found.")
-    return DATASET_LOADERS[dataset_name]()
+# }
+
+# def get_dataset(dataset_name):
+#     if dataset_name not in DATASET_LOADERS:
+#         raise ValueError(f"Dataset named '{dataset_name}' not found.")
+#     return DATASET_LOADERS[dataset_name]()

@@ -24,3 +24,8 @@ python run_model.py --model zero_shot --dataset minidev --llm gpt-4o --no_eviden
 python run_model.py --model din_sql --dataset minidev --llm gpt-4o --no_evidence
 ```
 
+统计信息
+```bash
+python run_model.py --model din_sql --dataset bird-dev --llm gpt-4o
+python run_model.py --model din_sql --dataset spider-dev --llm gpt-4o
+```

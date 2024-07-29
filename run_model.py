@@ -11,7 +11,7 @@ from src.models.zero_shot import ZeroShotModel
 from src.models.din_sql import DinSQLModel
 from src.datasets import get_dataset
 from langchain.chat_models import ChatOpenAI
-
+from tqdm import trange
 
 
 
@@ -133,6 +133,40 @@ def run_model_on_dataset(model_name, dataset_name, llm_name, no_evidence,eval_mo
     return accuracy
 
 
+
+def run_model_statistics(model_name, dataset_name, llm_name, no_evidence,eval_mode=False):
+    import tiktoken
+    encoder = tiktoken.encoding_for_model("gpt-4o")
+    def get_tokens_len(text):
+        return len(encoder.encode(text))
+    
+    dataset = get_dataset(dataset_name)
+    no_data_points = dataset.get_number_of_data_points()
+
+    # add for statistics
+    all_lens_sql_schemas = []
+    all_lens_bird_table_info = []
+    db_len_map = {}
+    for i in trange(no_data_points,ncols=100,colour='green',desc=f"Running {model_name} on {dataset_name}"):
+        data_point = dataset.get_data_point(i)
+        db_id = data_point['db_id']
+        if db_id not in db_len_map:
+            sql_schema = dataset.get_create_table_statements()
+            bird_table_info = dataset.get_bird_table_info()
+            db_len_map[db_id] = {
+                "sql_schema": get_tokens_len(sql_schema),
+                "bird_table_info": get_tokens_len(bird_table_info)
+            }
+
+        all_lens_sql_schemas.append(db_len_map[db_id]["sql_schema"])
+        all_lens_bird_table_info.append(db_len_map[db_id]["bird_table_info"])
+    
+    # calculate statistics
+    ave_sql_schema = sum(all_lens_sql_schemas) / len(all_lens_sql_schemas)
+    ave_bird_table_info = sum(all_lens_bird_table_info) / len(all_lens_bird_table_info)
+    print(f"Average SQL Schema Length: {ave_sql_schema}")
+    print(f"Average Bird Table Info Length: {ave_bird_table_info}")
+
 def main():
     parser = argparse.ArgumentParser(description='Run text-to-SQL models on specified datasets with an option to specify the OpenAI LLM to use.')
 
@@ -147,7 +181,8 @@ def main():
     print(f"No evidence: {args.no_evidence}")
     # exit()
     # Run the specified model on the specified dataset using the specified LLM
-    run_model_on_dataset(args.model, args.dataset, args.llm, args.no_evidence)
+    # run_model_on_dataset(args.model, args.dataset, args.llm, args.no_evidence)
+    run_model_statistics(args.model, args.dataset, args.llm, args.no_evidence)
 
 if __name__ == '__main__':
     main()

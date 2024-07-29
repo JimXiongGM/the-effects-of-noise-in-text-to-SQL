@@ -177,13 +177,15 @@ class Dataset:
 
       return table_info
 
-from src.datasets_minidiv import Dataset as MinidivDataset
+from src.datasets_minidiv import Dataset as MinidevDataset
 DATASET_LOADERS = {
     'FinancialCorrected-orignal': lambda: Dataset(data_path="datasets/financial.json"),
     'FinancialCorrected': lambda: Dataset(data_path='./datasets/financial_corrected.json'),
     'FinancialCorrectedSQL': lambda: Dataset(data_path='./datasets/financial_corrected_sql.json'),
     # add
-    "minidev": lambda: MinidivDataset(data_path='./minidev/mini_dev_sqlite.json'),
+    "minidev": lambda: MinidevDataset(data_path='./minidev/mini_dev_sqlite.json'),
+    "bird-dev": lambda: MinidevDataset(data_path='./bird/dev.json'),
+    "spider-dev": lambda: MinidevDataset(data_path='./spider/dev.json'),
 }
 
 def get_dataset(dataset_name):

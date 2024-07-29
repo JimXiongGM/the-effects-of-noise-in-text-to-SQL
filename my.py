@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-def fun1():
+def make_original():
     """
     make a prediction file of origin set.
     for SQL setting, q is the same. golden sql is different.
@@ -53,5 +53,5 @@ def print_results():
 
 if __name__ == "__main__":
     # python my.py
-    # fun1()
-    print_results()
+    make_original()
+    # print_results()

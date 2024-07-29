@@ -201,7 +201,6 @@ Based on the tables, columns, and Foreign_keys, The set of possible cell values 
 Schema_links: [lists.list_followers,lists_users.user_subscriber,lists.user_id = lists_user.user_id,lists.list_id = lists_user.list_id, lists_users.user_id, 4208563, 1]
 
 """   
-
 HUMAN_SCHEMA_LINKING_TEMPLATE = """
 For the given question, find the schema links between the question and the table.
 Hint helps you to find the correct schema_links.
@@ -656,7 +655,6 @@ Q: {question}
 Hint: {hint}
 Schema_links: {schema_links}
 SQL: """
-
 
 SYSTEM_NON_NESTED_CLASS_TEMPLATE = """
 Use the the schema links and intermediate reasoning steps to generate the correct sqlite SQL query for the given question.
