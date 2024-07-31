@@ -28,4 +28,5 @@ python run_model.py --model din_sql --dataset minidev --llm gpt-4o --no_evidence
 ```bash
 python run_model.py --model din_sql --dataset bird-dev --llm gpt-4o
 python run_model.py --model din_sql --dataset spider-dev --llm gpt-4o
+python run_model.py --model din_sql --dataset spider-test --llm gpt-4o
 ```

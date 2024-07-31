@@ -186,6 +186,7 @@ DATASET_LOADERS = {
     "minidev": lambda: MinidevDataset(data_path='./minidev/mini_dev_sqlite.json'),
     "bird-dev": lambda: MinidevDataset(data_path='./bird/dev.json'),
     "spider-dev": lambda: MinidevDataset(data_path='./spider/dev.json'),
+    "spider-test": lambda: MinidevDataset(data_path='./spider/test_data/dev.json'),
 }
 
 def get_dataset(dataset_name):

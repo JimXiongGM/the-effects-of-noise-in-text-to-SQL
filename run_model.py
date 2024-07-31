@@ -159,7 +159,7 @@ def run_model_statistics(model_name, dataset_name, llm_name, no_evidence,eval_mo
             }
 
         all_lens_sql_schemas.append(db_len_map[db_id]["sql_schema"])
-        all_lens_bird_table_info.append(db_len_map[db_id]["bird_table_info"])
+        all_lens_bird_table_info.append(db_len_map[db_id]["sql_schema"] + db_len_map[db_id]["bird_table_info"])
     
     # calculate statistics
     ave_sql_schema = sum(all_lens_sql_schemas) / len(all_lens_sql_schemas)
@@ -182,6 +182,8 @@ def main():
     # exit()
     # Run the specified model on the specified dataset using the specified LLM
     # run_model_on_dataset(args.model, args.dataset, args.llm, args.no_evidence)
+    
+    # my add
     run_model_statistics(args.model, args.dataset, args.llm, args.no_evidence)
 
 if __name__ == '__main__':
